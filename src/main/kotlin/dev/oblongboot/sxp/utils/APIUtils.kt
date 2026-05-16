@@ -24,7 +24,7 @@ object APIUtils {
     var ZombieXP: Long = 0
     var WolfXP: Long = 0
     var VampireXP: Long = 0
-
+    var isFirst = true
     val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     val json = Json { ignoreUnknownKeys = true }
     private var cachedContributors: List<Contributor> = emptyList()
@@ -71,7 +71,7 @@ object APIUtils {
         val ign = ChatUtils.mc.player?.gameProfile?.name ?: return
         // ChatUtils.modMessage(ign)
 
-        val url = "https://slayerxpoverlay.hypickelapi.workers.dev/slayer?username=$ign"
+        val url = "https://slayerxpoverlay.hypickelapi.workers.dev/slayer?uuid=${ChatUtils.mc.gameProfile.id.toString().replace("-", "")}"
         val response = requestJson<SlayerXPResponse>(url)
 
         if (response != null) {
@@ -95,6 +95,8 @@ object APIUtils {
     }
 
     fun getXP() {
+        if (Scoreboard.getSlayerType() == "Not in slayer area!" && !isFirst) return
+        isFirst = false
         scope.launch { xp() }
     }
 
